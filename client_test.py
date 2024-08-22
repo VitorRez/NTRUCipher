@@ -1,4 +1,6 @@
-from NTRU import *
+from crypto.ciphers import *
+from crypto.ntru.NTRU import *
+from crypto.ntru.ntrucipher import *
 import pickle
 import socket
 

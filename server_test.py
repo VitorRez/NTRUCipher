@@ -1,4 +1,6 @@
-from NTRU import *
+from crypto.ciphers import *
+from crypto.ntru.NTRU import *
+from crypto.ntru.ntrucipher import *
 import pickle
 import socket
 import threading
@@ -11,7 +13,7 @@ FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
 def handle_client(conn, addr, priv_key, pub_key):
-    print(f"[NEW CONNECTION] {addr} connected.")
+    print(f"[NEW CONNECTIsON] {addr} connected.")
     bytes_pub_key = pickle.dumps(pub_key)
     conn.send(bytes_pub_key)
     bytes_enc_text = get_msg(conn, addr)

@@ -1,9 +1,11 @@
-from ntru.mathutils import *
+from crypto.ntru.mathutils import *
 import numpy as np
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible
 from sympy import ZZ, Poly
+from scipy.stats import norm
 from Crypto.Hash import SHA256
+import hashlib
 
 class NtruCipher:
     N = None
@@ -51,28 +53,3 @@ class NtruCipher:
         a_poly = ((self.f_poly * msg_poly) % self.R_poly).trunc(self.q)
         b_poly = a_poly.trunc(self.p)
         return ((self.f_p_poly * b_poly) % self.R_poly).trunc(self.p)
-    
-    def sign(self, msg_poly):
-        s1_poly, s2_poly = None, None
-
-        # Gaussian sampling loop (simplified for demonstration purposes)
-        tries = 10
-        while tries > 0:
-            try:
-                # Generate random polynomials as part of the signature
-                s1_poly = random_poly(self.N, self.q // 3)
-                s2_poly = (msg_poly - (self.f_poly * s1_poly).trunc(self.q)).trunc(self.q)
-
-                # Ensure s2_poly is within the bounds by multiplying with f_p_poly
-                s2_poly = (self.f_p_poly * s2_poly).trunc(self.q)
-
-                return s1_poly, s2_poly
-
-            except Exception as e:
-                tries -= 1
-
-        raise Exception("Failed to generate a valid signature")
-    
-    def verify(self, msg_poly, s1_poly, s2_poly):
-        check_poly = (s1_poly + s2_poly * self.h_poly).trunc(self.q)
-        return check_poly == msg_poly

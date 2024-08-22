@@ -1,8 +1,8 @@
-from ntru.ntrucipher import NtruCipher
-from ntru.mathutils import random_poly
+from crypto.ntru.ntrucipher import NtruCipher
+from crypto.ntru.mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
-from padding.padding import padding_encode, padding_decode
+from crypto.padding.padding import padding_encode, padding_decode
 from Crypto.Hash import SHA256
 import numpy as np
 import math
@@ -48,30 +48,3 @@ def decrypt(priv_key, input):
     decrypted = ntru.decrypt(Poly(input_arr[::-1], x).set_domain(ZZ)).all_coeffs()[::-1]
 
     return(np.packbits(np.array(decrypted).astype(int)).tobytes())
-
-def sign(priv_key, input_str):
-
-    ntru = NtruCipher(int(priv_key['N']), int(priv_key['p']), int(priv_key['q']))
-    ntru.f_poly = Poly(priv_key['f'].astype(int)[::-1], x).set_domain(ZZ)
-    ntru.f_p_poly = Poly(priv_key['f_p'].astype(int)[::-1], x).set_domain(ZZ)
-
-    input_hash = SHA256.new(input_str).digest()
-
-    input_arr = np.unpackbits(np.frombuffer(input_hash, dtype=np.uint8))
-    
-    s1_poly, s2_poly = ntru.sign(input_arr)
-    return s1_poly, s2_poly
-
-def verify(pub_key, msg, s1_poly, s2_poly):
-
-    ntru = NtruCipher(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']))
-    ntru.h_poly = Poly(pub_key['h'].astype(int)[::-1], x).set_domain(ZZ)
-
-    input_hash = SHA256.new(msg).digest()
-
-    input_arr = np.unpackbits(np.frombuffer(input_hash, dtype=np.uint8))
-
-    if ntru.verify(input_arr, s1_poly, s2_poly):
-        print("Valid signature!")
-    else:
-        print("Invalid signature!")

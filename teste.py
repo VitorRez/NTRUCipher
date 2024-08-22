@@ -1,21 +1,15 @@
-from NTRU import *
+from crypto.ciphers import *
+from crypto.ntru.NTRU import *
+from crypto.ntru.ntrucipher import *
 
-# Generate the keys
-priv_key, pub_key = generate(N=251, p=3, q=128)
+priv_key_ntru, pub_key_ntru = generate(N=251, p=3, q=128)
+aes_key = get_random_bytes(16)
 
-# Example input array for encryption
-input_arr = b"banana"
+msg = b'banana'
 
-# Encrypt the input array using the public key
-encrypted = encrypt(pub_key, input_arr)
-print("Encrypted:", encrypted)
+e = CipherHandler(aes_key, pub_key_ntru)
+enc_text = e.e_protocol(msg)
+print(enc_text)
 
-# Decrypt the encrypted array using the private key
-decrypted = decrypt(priv_key, encrypted)
-print("Decrypted:",decrypted)
-
-# Sign the input array using private key
-s1, s2 = sign(priv_key, input_arr)
-
-# Verify the input array using public key
-verify(pub_key, input_arr, s1, s2)
+plaintext = e.d_protocol(enc_text, priv_key_ntru)
+print(plaintext)

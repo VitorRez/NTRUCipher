@@ -7,24 +7,16 @@ priv_key_ntru, pub_key_ntru = generate(N=251, p=3, q=128, Dmin=55, Dmax=87)
 #aes_key = get_random_bytes(16)
 
 msg = b'banana'
-msg2 = b'laranja'
 
-m_poly1, s1 = sign(priv_key_ntru, msg)
-m_poly2, s2 = sign(priv_key_ntru, msg2)
-print(verify(pub_key_ntru, m_poly1, s1))
-print(verify(pub_key_ntru, m_poly1, s2))
-print(verify(pub_key_ntru, m_poly2, s1))
-print(verify(pub_key_ntru, m_poly2, s2))
+output = encrypt(pub_key_ntru, msg)
 
-#output = encrypt(pub_key_ntru, msg)
+print(output)
 
-#print(output)
-
-#clear_msg = decrypt(priv_key_ntru, output)
+clear_msg = decrypt(priv_key_ntru, output)
 
 #clear_msg = [(x + 256) % 256 for x in clear_msg]
 
-#print(clear_msg)
+print(clear_msg)
 
 # Convert the list of integers to a byte array
 #byte_data = bytes(clear_msg)

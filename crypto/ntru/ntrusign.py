@@ -3,7 +3,6 @@ import numpy as np
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible
 from sympy import ZZ, Poly
-from scipy.stats import norm
 from Crypto.Hash import SHA256
 from random import choice
 
@@ -24,6 +23,9 @@ class NtruSign:
     Ff = 70
     Fg = 40
     Fm = 32
+
+    w2_limit = 32
+    w1_limit = 25
 
     Dmin = None
     Dmax = None
@@ -90,19 +92,16 @@ class NtruSign:
         first_half = hash_integers[:32]
         second_half = hash_integers[32:64]
 
-        poly_terms = [(x**e) for e in first_half] + [(-x**e) for e in second_half]
+        coeffs = [(x**e) for e in first_half] + [(-x**e) for e in second_half]
 
-        m_poly = Poly(sum(poly_terms, x)).set_domain(ZZ)
+        m_poly = Poly(sum(coeffs, x)).set_domain(ZZ)
 
         return (m_poly % self.R_poly).trunc(self.p)
 
-        #return m_poly
-
     def generate_w2(self):
-        w2 = random_poly(self.N, self.Fm)
+        w2 = random_poly(self.N, self.w2_limit)
         return w2
 
-    
     def generate_w1(self, m_poly, w2):
 
         sl = (self.f_poly * (m_poly + self.p * w2) % self.R_poly).trunc(self.q)
@@ -110,11 +109,11 @@ class NtruSign:
 
         coeffs = [0] * self.N
         non_zero_count = 0
-        
+
         for i in range(self.N):
-            m_i = m_poly.coeffs()[i]  if i < len(m_poly.coeffs()) else 0
-            sl_i = sl.coeffs()[i]  if i < len(sl.coeffs()) else 0
-            tl_i = tl.coeffs()[i]  if i < len(tl.coeffs()) else 0
+            sl_i = sl.coeffs()[i] if i < len(sl.coeffs()) else 0
+            tl_i = tl.coeffs()[i] if i < len(tl.coeffs()) else 0
+            m_i = m_poly.coeffs()[i] if i < len(m_poly.coeffs()) else 0
 
             if sl_i % self.p != m_i % self.p and tl_i % self.p != m_i % self.p and sl_i % self.p == tl_i % self.p:
                 coeffs[i] = (m_i - sl_i) % self.p
@@ -129,17 +128,25 @@ class NtruSign:
 
             if coeffs[i] != 0:
                 non_zero_count += 1
-            
-            if non_zero_count > 25:
+
+            if non_zero_count > self.w1_limit:
                 break
-
+        
+        coeffs_2 = [0] * self.N
         for i in range(self.N):
-            if np.random.rand() < 1/3:
-                m_i = m_poly.coeffs()[i] if i < len(m_poly.coeffs()) else 0
+            if np.random.rand() < 1/self.p:
                 w1_i = coeffs[i] if i < len(coeffs) else 0
-                w2 = w2 - Poly(m_i + w1_i, x)
+                m_i = m_poly.coeffs()[i] if i < len(m_poly.coeffs()) else 0
+                w2_i = w2.coeffs()[i] if i < len(w2.coeffs()) else 0
 
-        return Poly(coeffs, x).set_domain(ZZ)
+                coeffs_2[i] = w2_i - m_i - w1_i
+            else:
+                coeffs_2[i] = w2.coeffs()[i] if i < len(w2.coeffs()) else 0
+
+        w2 = Poly(coeffs_2, x).set_domain(ZZ)
+        w1 = Poly(coeffs, x).set_domain(ZZ)
+
+        return w1
 
     def generate_w(self, m_poly):
         w2 = self.generate_w2()

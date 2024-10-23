@@ -69,11 +69,11 @@ def sign(priv_key, pub_key, input_str):
         raise Exception("Input is too large for current N")
     
     m_poly, s = ntru.sign(input_str)
-    return m_poly, s
+    return m_poly.all_coeffs(), s.all_coeffs()
 
 def verify(pub_key, m_poly, s):
 
     ntru = NtruSign(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']), int(pub_key['Dmin']), int(pub_key['Dmax']))
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
     
-    return ntru.verify(m_poly, s)
+    return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(s, x).set_domain(ZZ))

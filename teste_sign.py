@@ -10,7 +10,7 @@ msg = b'banana'
 
 m_poly, s1 = sign(priv_key, pub_key, msg)
 
-#print(m_poly.all_coeffs(), s1.all_coeffs())
+print(m_poly, s1)
 
 #tries = 1
 #while not verify(p2, m_poly, s1):

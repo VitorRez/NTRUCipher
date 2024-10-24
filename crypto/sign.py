@@ -12,9 +12,10 @@ class signature:
         return sign(self.priv_key, self.pub_key, msg)
     
     def verify(self, msg, s):
-        if verify(self.pub_key, msg, s):
-            print('Valid signature.')
-            return True
-        else:
-            print('Invalid signature.')
-            return False
+        return verify(self.pub_key, msg, s)
+        #if verify(self.pub_key, msg, s):
+            #print('Valid signature.')
+            #return True
+        #else:
+            #print('Invalid signature.')
+            #return False

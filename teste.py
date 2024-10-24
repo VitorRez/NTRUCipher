@@ -10,8 +10,6 @@ msg = b'banana'
 
 output = encrypt(pub_key_ntru, msg)
 
-print(output)
-
 clear_msg = decrypt(priv_key_ntru, output)
 
 #clear_msg = [(x + 256) % 256 for x in clear_msg]

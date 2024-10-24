@@ -17,8 +17,8 @@ def encrypt_pbkdf(key_ntru, password, salt):
 
 def decrypt_pbkdf(enc_key, password, salt):
     key_sym = PBKDF(password, salt)
-    c = CipherHandler(key_sym, 0)
-    key_ntru = c.decrypt_sym(enc_key[0], enc_key[1], key_sym)
+    c = CipherHandler(aes_key=key_sym)
+    key_ntru = c.decrypt_sym(enc_key[0], enc_key[1])
     return pickle.loads(key_ntru)
 
 def verify_password(password, p_hash):

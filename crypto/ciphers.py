@@ -6,7 +6,7 @@ import pickle
 
 class CipherHandler:
 
-    def __init__(self, aes_key, ntru_key):
+    def __init__(self, aes_key=0, ntru_key=0):
         self.aes_key = aes_key
         self.ntru_key = ntru_key
 
@@ -19,8 +19,8 @@ class CipherHandler:
             ciphertext, tag = cipher.encrypt_and_digest(msg.encode('utf-8'))
         return (nonce, ciphertext)
 
-    def decrypt_sym(self, nonce, ciphertext, key):
-        cipher = AES.new(key, AES.MODE_EAX, nonce)
+    def decrypt_sym(self, nonce, ciphertext):
+        cipher = AES.new(self.aes_key, AES.MODE_EAX, nonce)
         msg = cipher.decrypt(ciphertext)
         if type(msg) != bytes:
             msg = bytes.decode(msg)
@@ -38,9 +38,9 @@ class CipherHandler:
         separator = b'-----'
         return enc[0] + separator + enc[1] + separator + pickle.dumps(enc_ntru)
 
-    def d_protocol(self, enc_text, ntru_key):
+    def d_protocol(self, enc_text):
         separator = b'-----'
         enc = enc_text.split(separator)
-        aes_key = self.decrypt(pickle.loads(enc[2]), ntru_key)
-        msg = self.decrypt_sym(enc[0], enc[1], aes_key)
+        self.aes_key = self.decrypt(pickle.loads(enc[2]), self.ntru_key)
+        msg = self.decrypt_sym(enc[0], enc[1])
         return msg

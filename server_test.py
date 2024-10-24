@@ -1,4 +1,5 @@
 from crypto.ciphers import *
+from crypto.sign import *
 from crypto.ntru.NTRU import *
 from crypto.ntru.ntrucipher import *
 from crypto.ntru.ntrusign import *
@@ -25,23 +26,24 @@ def handle_client(conn, addr, priv_key, pub_key):
     conn.send(pickle.dumps(pub_key))
 
     #receive enc_text
-    enc_text = pickle.loads(get_msg(conn, addr))
-    d_enc = CipherHandler(0, priv_key)
-    clear_text = d_enc.d_protocol(enc_text, priv_key)
+    enc_text = get_msg(conn, addr)
+    d_enc = CipherHandler(ntru_key=priv_key)
+    clear_text = d_enc.d_protocol(enc_text)
     print(clear_text)
 
     #send ACK
-    conn.send("Ok!")
+    conn.send(b"Ok!")
 
     #receive signature
-    m = pickle.loads(get_msg(conn, addr))
-    signature = pickle.loads(get_msg(conn, addr))
+    document = get_msg(conn, addr)
+    signed_document = get_msg(conn, addr)
+    s = signature(priv_key=priv_key, pub_key=pub_key_c)
 
     #send ACK
-    if verify(pub_key_c, m, signature):
-        conn.send("Ok!")
+    if s.verify(document, signed_document):
+        conn.send(b"Ok!")
     else:
-        conn.send("Invalid signature")
+        conn.send(b"Invalid signature")
 
     conn.close()
 

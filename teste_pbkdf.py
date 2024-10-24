@@ -21,14 +21,12 @@ enc_key = encrypt_pbkdf(priv_key_ntru, password, salt)
 
 enc_msg = c_enc.e_protocol(msg)
 
-print(enc_msg)
-
 #decrypt
 
 if verify_password('amobanana', password_hash):
-    priv_key = decrypt_pbkdf(enc_key, password, salt)
-    d_enc = CipherHandler(0, priv_key)
-    clear_msg = d_enc.d_protocol(enc_msg, priv_key)
+    priv_key = decrypt_pbkdf(enc_key, 'amobanana', salt)
+    d_enc = CipherHandler(ntru_key=priv_key)
+    clear_msg = d_enc.d_protocol(enc_msg)
     print(clear_msg)
 else:
     print("Invalid password.")

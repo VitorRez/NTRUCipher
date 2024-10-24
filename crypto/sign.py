@@ -2,15 +2,17 @@ from crypto.ntru.NTRU import *
 from crypto.ntru.ntrusign import NtruSign
 
 class signature:
-    def __init__(self, keys):
-        self.keys = keys
+    def __init__(self, priv_key=0, pub_key=0):
+        self.priv_key = priv_key
+        self.pub_key = pub_key
 
-    def sign(self, message):
-        s = sign(self.keys[0], self.keys[1], message)
-        return s
+    def sign(self, msg):
+        if type(msg) != bytes:
+            msg = msg.encode('utf-8') 
+        return sign(self.priv_key, self.pub_key, msg)
     
-    def verify(self, msg, s, key):
-        if verify(key, msg, s):
+    def verify(self, msg, s):
+        if verify(self.pub_key, msg, s):
             print('Valid signature.')
             return True
         else:

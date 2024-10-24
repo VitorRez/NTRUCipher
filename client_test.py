@@ -1,4 +1,5 @@
 from crypto.ciphers import *
+from crypto.sign import *
 from crypto.ntru.NTRU import *
 from crypto.ntru.ntrucipher import *
 from crypto.ntru.ntrusign import *
@@ -21,6 +22,15 @@ def send(msg, client):
     client.send(send_length)
     client.send(message)
 
+def recv_complete(sock):
+    data = b""
+    while True:
+        part = sock.recv(2048)
+        data += part
+        if len(part) < 2048:  # Se o tamanho for menor que o buffer, terminou de receber
+            break
+    return data
+
 def send_to_server(text, c_pub_key, enc_key, aes_key, password_hash, salt):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
@@ -31,25 +41,26 @@ def send_to_server(text, c_pub_key, enc_key, aes_key, password_hash, salt):
     send(pickle.dumps(c_pub_key), client)
 
     #receive public key
-    pub_key_s = pickle.loads(client.recv(2048))
+    pub_key_s = pickle.loads(recv_complete(client))
 
     #send enc_text
     c_enc = CipherHandler(aes_key, pub_key_s)
     enc_text = c_enc.e_protocol(text)
-    send(pickle.dumps(enc_text), client)
+    send(enc_text, client)
 
     #receive ACK
-    print(client.recv(2048))
+    print(recv_complete(client))
 
     #send signature
     if verify_password("amobanana", password_hash):
-        priv_key = decrypt_pbkdf(enc_key, password_hash, salt)
-        signature = sign(priv_key, c_pub_key)
-        send(pickle.dumps(signature[0]), client)
-        send(pickle.dumps(signature[1]), client)
+        priv_key = decrypt_pbkdf(enc_key, "amobanana", salt)
+        s = signature(priv_key, c_pub_key)
+        document, signed_document  = s.sign(text)
+        send(document, client)
+        send(signed_document, client)
 
     #receive ACK
-    print(client.recv(2048))
+    print(recv_complete(client))
 
     client.close()
 

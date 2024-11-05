@@ -5,8 +5,11 @@ from sympy.abc import x
 from sympy import ZZ, Poly
 from crypto.padding.padding import padding_encode, padding_decode
 from Crypto.Hash import SHA256
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 import numpy as np
 import math
+import base64
 import pickle
 
 def generate(N, p, q, Dmin, Dmax):
@@ -27,8 +30,13 @@ def generate(N, p, q, Dmin, Dmax):
     
     priv_key = {'N': N, 'p': p, 'q': q, 'f_c': f_c, 'f_p_c': f_p_c, 'g_c': g_c, 'f_s': f_s, 'g_s': g_s, 'Dmin': Dmin, 'Dmax': Dmax}
     pub_key = {'N': N, 'p': p, 'q': q, 'h_c': h_c, 'h_s': h_s, 'Dmin': Dmin, 'Dmax': Dmax}
-    
-    return pickle.dumps(priv_key), pickle.dumps(pub_key)
+
+    #TESTE
+    print(pickle.dumps(priv_key))
+    print()
+    print(pickle.dumps(pub_key))
+    print()
+    return export_keys(pickle.dumps(priv_key), pickle.dumps(pub_key))
 
 def encrypt(pub_key, input_str):
 
@@ -87,3 +95,25 @@ def verify(pub_key, m_poly, s):
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
     
     return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(s, x).set_domain(ZZ))
+
+def export_keys(priv_key, pub_key):
+
+    priv_key_64 = base64.encodebytes(priv_key).decode('utf-8')
+    pub_key_64 = base64.encodebytes(pub_key).decode('utf-8')
+
+    pem_priv_key = f'-----BEGIN PRIVATE KEY-----\n{priv_key_64}-----END PRIVATE KEY-----'
+    pem_pub_key = f'-----BEGIN PUBLIC KEY-----\n{pub_key_64}-----END PUBLIC KEY-----'
+
+    return pem_priv_key, pem_pub_key
+
+def import_public_key(pem_data):
+    pem_body = pem_data.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").strip()
+
+    key_bytes = base64.decodebytes(pem_body.encode('utf-8'))
+    return key_bytes
+
+def import_private_key(pem_data):
+    pem_body = pem_data.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").strip()
+
+    key_bytes = base64.decodebytes(pem_body.encode('utf-8'))
+    return key_bytes

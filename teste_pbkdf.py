@@ -1,6 +1,6 @@
-from crypto.PBKDF import *
-from crypto.ciphers import *
-from crypto.hash import *
+from PyNTRU.PBKDF import *
+from PyNTRU.ciphers import *
+from PyNTRU.ntru.hash import *
 from Crypto.Random import get_random_bytes
 
 msg = "banana"

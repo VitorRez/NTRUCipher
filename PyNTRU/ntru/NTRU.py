@@ -1,9 +1,9 @@
-from crypto.ntru.ntrucipher import NtruCipher
-from crypto.ntru.ntrusign import NtruSign
-from crypto.ntru.mathutils import random_poly
+from PyNTRU.ntru.ntrucipher import NtruCipher
+from PyNTRU.ntru.ntrusign import NtruSign
+from PyNTRU.ntru.mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
-from crypto.padding.padding import padding_encode, padding_decode
+from PyNTRU.padding.padding import padding_encode, padding_decode
 from Crypto.Hash import SHA256
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -31,12 +31,7 @@ def generate(N, p, q, Dmin, Dmax):
     priv_key = {'N': N, 'p': p, 'q': q, 'f_c': f_c, 'f_p_c': f_p_c, 'g_c': g_c, 'f_s': f_s, 'g_s': g_s, 'Dmin': Dmin, 'Dmax': Dmax}
     pub_key = {'N': N, 'p': p, 'q': q, 'h_c': h_c, 'h_s': h_s, 'Dmin': Dmin, 'Dmax': Dmax}
 
-    #TESTE
-    print(pickle.dumps(priv_key))
-    print()
-    print(pickle.dumps(pub_key))
-    print()
-    return export_keys(pickle.dumps(priv_key), pickle.dumps(pub_key))
+    return pickle.dumps(priv_key), pickle.dumps(pub_key)
 
 def encrypt(pub_key, input_str):
 
@@ -79,8 +74,8 @@ def sign(priv_key, pub_key, input_str):
     ntru.g_poly = Poly(priv_key['g_s'].astype(int)[::-1], x).set_domain(ZZ)
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
 
-    if ntru.N < len(input_str):
-        raise Exception("Input is too large for current N")
+    #if ntru.N < len(input_str):
+    #    raise Exception("Input is too large for current N")
     
     m_poly, s = ntru.sign(input_str)
     return pickle.dumps(m_poly.all_coeffs()), pickle.dumps(s.all_coeffs())
@@ -96,24 +91,3 @@ def verify(pub_key, m_poly, s):
     
     return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(s, x).set_domain(ZZ))
 
-def export_keys(priv_key, pub_key):
-
-    priv_key_64 = base64.encodebytes(priv_key).decode('utf-8')
-    pub_key_64 = base64.encodebytes(pub_key).decode('utf-8')
-
-    pem_priv_key = f'-----BEGIN PRIVATE KEY-----\n{priv_key_64}-----END PRIVATE KEY-----'
-    pem_pub_key = f'-----BEGIN PUBLIC KEY-----\n{pub_key_64}-----END PUBLIC KEY-----'
-
-    return pem_priv_key, pem_pub_key
-
-def import_public_key(pem_data):
-    pem_body = pem_data.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").strip()
-
-    key_bytes = base64.decodebytes(pem_body.encode('utf-8'))
-    return key_bytes
-
-def import_private_key(pem_data):
-    pem_body = pem_data.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").strip()
-
-    key_bytes = base64.decodebytes(pem_body.encode('utf-8'))
-    return key_bytes

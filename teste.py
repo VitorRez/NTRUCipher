@@ -1,6 +1,6 @@
-from crypto.ciphers import *
-from crypto.ntru.NTRU import *
-from crypto.ntru.ntrucipher import *
+from PyNTRU.ciphers import *
+from PyNTRU.ntru.NTRU import *
+from PyNTRU.ntru.ntrucipher import *
 
 priv_key_ntru, pub_key_ntru = generate(N=251, p=3, q=128, Dmin=55, Dmax=87)
 

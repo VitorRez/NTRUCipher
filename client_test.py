@@ -1,9 +1,9 @@
-from crypto.ciphers import *
-from crypto.sign import *
-from crypto.ntru.NTRU import *
-from crypto.ntru.ntrucipher import *
-from crypto.ntru.ntrusign import *
-from crypto.PBKDF import *
+from PyNTRU.ciphers import *
+from PyNTRU.sign import *
+from PyNTRU.ntru.NTRU import *
+from PyNTRU.ntru.ntrucipher import *
+from PyNTRU.ntru.ntrusign import *
+from PyNTRU.PBKDF import *
 import pickle
 import socket
 

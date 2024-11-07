@@ -1,4 +1,4 @@
-from crypto.ntru.mathutils import *
+from PyNTRU.ntru.mathutils import *
 import numpy as np
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible
@@ -177,8 +177,6 @@ class NtruSign:
 
         a_p = [(c % self.p - self.p if c % self.p >= self.p/2 else c % self.p) for c in a_q]
         b_p = [(c % self.p - self.p if c % self.p >= self.p/2 else c % self.p) for c in b_q]
-
-        print(sum(1 for a, b in zip(a_p, b_p) if a != b))
 
         return sum(1 for a, b in zip(a_p, b_p) if a != b)
 

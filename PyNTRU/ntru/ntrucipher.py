@@ -1,4 +1,4 @@
-from crypto.ntru.mathutils import *
+from PyNTRU.ntru.mathutils import *
 import numpy as np
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible

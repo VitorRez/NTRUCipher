@@ -1,10 +1,11 @@
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
-from crypto.ciphers import CipherHandler
-from crypto.hash import *
+from PyNTRU.ciphers import CipherHandler
+from PyNTRU.ntru.hash import *
 import pickle
 
+#Password-Based Key Derivation Function
 def PBKDF(password, salt):
     key = PBKDF2(password, salt, 16, count=1000000, hmac_hash_module=SHA256)
     return key

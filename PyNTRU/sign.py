@@ -1,7 +1,8 @@
-from crypto.ntru.NTRU import *
-from crypto.ntru.ntrusign import NtruSign
+from PyNTRU.ntru.NTRU import *
+from PyNTRU.certificate import *
 
-class signature:
+class Signature:
+
     def __init__(self, priv_key=0, pub_key=0):
         self.priv_key = priv_key
         self.pub_key = pub_key
@@ -13,9 +14,6 @@ class signature:
     
     def verify(self, msg, s):
         return verify(self.pub_key, msg, s)
-        #if verify(self.pub_key, msg, s):
-            #print('Valid signature.')
-            #return True
-        #else:
-            #print('Invalid signature.')
-            #return False
+    
+        
+    

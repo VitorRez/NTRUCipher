@@ -1,14 +1,9 @@
 from PyNTRU.ntru.mathutils import *
-import numpy as np
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible
 from sympy import ZZ, Poly
-from scipy.stats import norm
-from Crypto.Hash import SHA256
-from random import choice
-import hashlib
 
-class NtruCipher:
+class NTRUEncrypt:
     N = None
     p = None
     q = None
@@ -53,8 +48,6 @@ class NtruCipher:
         p_f_q_poly = (self.p * self.f_q_poly).trunc(self.q)
         h_before_mod = (p_f_q_poly * self.g_poly).trunc(self.q)
         self.h_poly = (h_before_mod % self.R_poly).trunc(self.q)
-
-        #self.h_poly = (self.f_q_poly * self.g_poly).trunc(self.q)
 
     def encrypt(self, msg_poly, rand_poly):
         return (((rand_poly * self.h_poly).trunc(self.q) + msg_poly) % self.R_poly).trunc(self.q)

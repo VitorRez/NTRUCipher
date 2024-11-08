@@ -6,7 +6,7 @@ from sympy import ZZ, Poly
 from Crypto.Hash import SHA256
 from random import choice
 
-class NtruSign:
+class NSS:
     N = None
     p = None
     q = None

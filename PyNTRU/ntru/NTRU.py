@@ -1,5 +1,5 @@
-from PyNTRU.ntru.ntrucipher import NtruCipher
-from PyNTRU.ntru.ntrusign import NtruSign
+from PyNTRU.ntru.NTRUEncrypt import NtruCipher
+from PyNTRU.ntru.NSS import NtruSign
 from PyNTRU.ntru.mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
@@ -74,8 +74,8 @@ def sign(priv_key, pub_key, input_str):
     ntru.g_poly = Poly(priv_key['g_s'].astype(int)[::-1], x).set_domain(ZZ)
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
 
-    #if ntru.N < len(input_str):
-    #    raise Exception("Input is too large for current N")
+    if ntru.N < len(input_str):
+        raise Exception("Input is too large for current N")
     
     m_poly, s = ntru.sign(input_str)
     return pickle.dumps(m_poly.all_coeffs()), pickle.dumps(s.all_coeffs())

@@ -1,18 +1,20 @@
 from PyNTRU.ntru.NTRU import *
 from PyNTRU.sign import *
-from keys import *
+from PyNTRU.keys import *
+from PyNTRU.ntru.hash import *
 import datetime
 
 #information signed with a certifying authority key used to verify the document
 def request(version, subject_name, subjectPKInfo, signature):
     request = f"version: {version}\nsubject name: {subject_name}\nsubject public key: {subjectPKInfo}"
-    m, s = signature.sign(request)
+    request_hash = create_hash(request)
+    m, s = signature.sign(request_hash)
     
     return m, s
 
 #creates a x509 certificate
 def create_certificate(issuer_name, sub_name, sub_pubkey, sub_country, id, local, s):
-    filename = f"{local}/certificate_{id}.pem"
+    filename = f"{local}certificate_{id}.pem"
     with open(filename, "w") as cert:
         current_time = datetime.datetime.now()
         issuer_country = "BR"

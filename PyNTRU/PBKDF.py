@@ -1,7 +1,6 @@
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA256
-from Crypto.Random import get_random_bytes
-from PyNTRU.ciphers import CipherHandler
+from PyNTRU.encrypt import CipherHandler
 from PyNTRU.ntru.hash import *
 import pickle
 

@@ -1,7 +1,7 @@
 from PyNTRU.ntru.NTRU import *
 
 def generate_keys():
-    return generate(N=251, p=3, q=128, Dmin=55, Dmax=87)
+    return generate(N=256, p=3, q=128, Dmin=55, Dmax=87)
 
 def export_key(key, type='public'):
 

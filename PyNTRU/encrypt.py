@@ -1,11 +1,9 @@
 from PyNTRU.ntru.NTRU import *
-from PyNTRU.ntru.ntrucipher import NtruCipher
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
 import pickle
 
 #class used to encrypt and decrypt messages using a key encapsulation mechanism
-class CipherHandler:
+class Encrypt:
 
     def __init__(self, aes_key=0, ntru_key=0):
         self.aes_key = aes_key

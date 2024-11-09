@@ -1,31 +1,21 @@
 from PyNTRU.ntru.NTRU import *
-from Crypto.Cipher import AES
+from PyNTRU.encrypt_sym import *
 import pickle
 
 #class used to encrypt and decrypt messages using a key encapsulation mechanism
 class Encrypt:
 
-    def __init__(self, aes_key=0, ntru_key=0):
-        self.aes_key = aes_key
+    def __init__(self, ntru_key):
+        self.aes_key = get_random_bytes(16)
         self.ntru_key = ntru_key
 
     #encrypt message with an AES key
     def encrypt_sym(self, msg):
-        cipher = AES.new(self.aes_key, AES.MODE_EAX)
-        nonce = cipher.nonce
-        if type(msg) == bytes:
-            ciphertext, tag = cipher.encrypt_and_digest(msg)
-        else:
-            ciphertext, tag = cipher.encrypt_and_digest(msg.encode('utf-8'))
-        return (nonce, ciphertext)
+        return encrypt_sym(self.aes_key, msg)
 
     #decrypt message with an AES key
-    def decrypt_sym(self, nonce, ciphertext):
-        cipher = AES.new(self.aes_key, AES.MODE_EAX, nonce)
-        msg = cipher.decrypt(ciphertext)
-        if type(msg) != bytes:
-            msg = bytes.decode(msg)
-        return msg
+    def decrypt_sym(self, ciphertext):
+        return decrypt_sym(self.aes_key, ciphertext)
     
     #encrypt message with a NTRU public key
     def encrypt(self, msg):
@@ -47,5 +37,5 @@ class Encrypt:
         separator = b'-----'
         enc = enc_text.split(separator)
         self.aes_key = self.decrypt(pickle.loads(enc[2]), self.ntru_key)
-        msg = self.decrypt_sym(enc[0], enc[1])
+        msg = self.decrypt_sym(enc)
         return msg

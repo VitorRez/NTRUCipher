@@ -3,17 +3,16 @@ from PyNTRU.certificate import *
 
 class Signature:
 
-    def __init__(self, priv_key=0, pub_key=0):
-        self.priv_key = priv_key
-        self.pub_key = pub_key
+    def __init__(self, ntru_key):
+        self.ntru_key = ntru_key
 
-    def sign(self, msg):
+    def sign(self, pub_key, msg):
         if type(msg) != bytes:
             msg = msg.encode('utf-8') 
-        return sign(self.priv_key, self.pub_key, msg)
+        return sign(self.ntru_key, pub_key, msg)
     
-    def verify(self, msg, s):
-        return verify(self.pub_key, msg, s)
+    def verify(self, s):
+        return verify(self.ntru_key, s[0], s[1])
     
         
     

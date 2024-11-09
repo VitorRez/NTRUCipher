@@ -1,19 +1,14 @@
-from PyNTRU.ntru.NTRUEncrypt import NtruCipher
-from PyNTRU.ntru.NSS import NtruSign
+from PyNTRU.ntru.NTRUEncrypt import NTRUEncrypt
+from PyNTRU.ntru.NSS import NSS
 from PyNTRU.ntru.mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
-from PyNTRU.padding.padding import padding_encode, padding_decode
-from Crypto.Hash import SHA256
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.backends import default_backend
 import numpy as np
 import math
-import base64
 import pickle
 
 def generate(N, p, q, Dmin, Dmax):
-    ntruc = NtruCipher(N, p, q)
+    ntruc = NTRUEncrypt(N, p, q)
     ntruc.generate_random_keys()
     
     g_c = np.array(ntruc.g_poly.all_coeffs()[::-1])
@@ -21,7 +16,7 @@ def generate(N, p, q, Dmin, Dmax):
     f_c = np.array(ntruc.f_poly.all_coeffs()[::-1])
     f_p_c = np.array(ntruc.f_p_poly.all_coeffs()[::-1])
 
-    ntrus = NtruSign(N, p, q, Dmin, Dmax)
+    ntrus = NSS(N, p, q, Dmin, Dmax)
     ntrus.generate_random_keys()
 
     g_s = np.array(ntrus.g_poly.all_coeffs()[::-1])
@@ -38,7 +33,7 @@ def encrypt(pub_key, input_str):
     input = np.unpackbits(np.frombuffer(input_str, dtype=np.uint8))
     pub_key = pickle.loads(pub_key)
     
-    ntru = NtruCipher(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']))
+    ntru = NTRUEncrypt(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']))
     ntru.h_poly = Poly(pub_key['h_c'].astype(int)[::-1], x).set_domain(ZZ)
 
     if ntru.N < len(input):
@@ -53,7 +48,7 @@ def decrypt(priv_key, input):
     input = pickle.loads(input)
     priv_key = pickle.loads(priv_key)
 
-    ntru = NtruCipher(int(priv_key['N']), int(priv_key['p']), int(priv_key['q']))
+    ntru = NTRUEncrypt(int(priv_key['N']), int(priv_key['p']), int(priv_key['q']))
     ntru.f_poly = Poly(priv_key['f_c'].astype(int)[::-1], x).set_domain(ZZ)
     ntru.f_p_poly = Poly(priv_key['f_p_c'].astype(int)[::-1], x).set_domain(ZZ)
 
@@ -69,7 +64,7 @@ def sign(priv_key, pub_key, input_str):
     pub_key = pickle.loads(pub_key)
     priv_key = pickle.loads(priv_key)
 
-    ntru = NtruSign(int(priv_key['N']), int(priv_key['p']), int(priv_key['q']), int(priv_key['Dmin']), int(priv_key['Dmax']))
+    ntru = NSS(int(priv_key['N']), int(priv_key['p']), int(priv_key['q']), int(priv_key['Dmin']), int(priv_key['Dmax']))
     ntru.f_poly = Poly(priv_key['f_s'].astype(int)[::-1], x).set_domain(ZZ)
     ntru.g_poly = Poly(priv_key['g_s'].astype(int)[::-1], x).set_domain(ZZ)
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
@@ -86,7 +81,7 @@ def verify(pub_key, m_poly, s):
     s = pickle.loads(s)
     pub_key = pickle.loads(pub_key)
 
-    ntru = NtruSign(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']), int(pub_key['Dmin']), int(pub_key['Dmax']))
+    ntru = NSS(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']), int(pub_key['Dmin']), int(pub_key['Dmax']))
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
     
     return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(s, x).set_domain(ZZ))

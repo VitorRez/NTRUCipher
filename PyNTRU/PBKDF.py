@@ -1,29 +1,27 @@
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA256
-from PyNTRU.encrypt import CipherHandler
-from PyNTRU.ntru.hash import *
+from Crypto.Random import get_random_bytes
+from PyNTRU.encrypt import Encrypt
+from PyNTRU.encrypt_sym import *
+from PyNTRU.ntru.hash import create_hash, verify_hash
 import pickle
 
 #Password-Based Key Derivation Function
-def PBKDF(password, salt):
+def PBKDF(password, salt=None):
+    if salt == None:
+        salt = get_random_bytes(16)
     key = PBKDF2(password, salt, 16, count=1000000, hmac_hash_module=SHA256)
-    return key
+    p_hash = create_hash(password)
+    return {'key': key, 'salt': salt, 'p_hash': p_hash}
 
-def encrypt_pbkdf(key_ntru, password, salt):
-    key_sym = PBKDF(password, salt)
-    c = CipherHandler(key_sym, 0)
-    enc_key = c.encrypt_sym(pickle.dumps(key_ntru))
+def encrypt_pbkdf(key_pbkdf, key_ntru):
+    enc_key = encrypt_sym(key_pbkdf['key'], pickle.dumps(key_ntru))
     return enc_key
 
-def decrypt_pbkdf(enc_key, password, salt):
-    key_sym = PBKDF(password, salt)
-    c = CipherHandler(aes_key=key_sym)
-    key_ntru = c.decrypt_sym(enc_key[0], enc_key[1])
-    return pickle.loads(key_ntru)
-
-def verify_password(password, p_hash):
+def decrypt_pbkdf(password, key_pbkdf, enc_key):
     p_hash1 = create_hash(password)
-    if p_hash == p_hash1:
-        return True
+    if key_pbkdf['p_hash'] == p_hash1:
+        key_ntru = decrypt_sym(key_pbkdf['key'], enc_key)
+        return pickle.loads(key_ntru)
     else:
-        return False
+        return None

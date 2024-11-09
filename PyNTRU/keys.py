@@ -1,4 +1,5 @@
 from PyNTRU.ntru.NTRU import *
+import base64
 
 def generate_keys():
     return generate(N=256, p=3, q=128, Dmin=55, Dmax=87)

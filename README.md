@@ -31,7 +31,7 @@ functions are as follow:
 
 Listed below you can see an example of code using the functions of PyNTRU:
 
-### Encryption Example
+### Encryption Example:
 
 ```python
 from PyNTRU.NTRU import *
@@ -50,3 +50,24 @@ plain_text = decrypt(priv_key, enc_text)
 
 if plain_text == msg:
     print('success!')
+
+### Signature Example
+
+```python
+from PyNTRU.NTRU import *
+
+#message that will be signed
+msg = b'Lorem ipsum odor amet, consectetuer adipiscing elit. Neque bibendum nulla lacinia pulvinar elementum non dui! Rhoncus justo nullam placerat eu duis ridiculus luctus. Ut egestas ante justo fermentum suspendisse consequat ligula. Curabitur blandit magnis dig'
+
+#generation of keys
+keys = generate()
+
+#signing the message
+signed_msg = sign(keys['private_key'], keys['public_key'], msg)
+
+#signature verification
+if verify(keys['public_key'], signed_msg):
+    print('Valid signature!')
+else:
+    print('Invalid signature.')
+

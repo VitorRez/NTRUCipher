@@ -49,9 +49,10 @@ enc_text = encrypt(pub_key, msg)
 plain_text = decrypt(priv_key, enc_text)
 
 if plain_text == msg:
-    print('success!')
+    print('success!') 
+```
 
-### Signature Example
+### Signature Example:
 
 ```python
 from PyNTRU.NTRU import *
@@ -70,4 +71,5 @@ if verify(keys['public_key'], signed_msg):
     print('Valid signature!')
 else:
     print('Invalid signature.')
+```
 

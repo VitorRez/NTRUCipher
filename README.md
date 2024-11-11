@@ -14,6 +14,7 @@ generate(N=256, p=3, q=128, Dmin=55, Dmax=87):
 encrypt(pub_key, input_str):
 
 - encrypts a message encode in input_str
+- we recommend the use of a key encapsulation mechanism, due to the limited size of input_str ( 32 characters ), however, we are currently working in a way to encrypt large messages parsing it in smaller messages.
 
 decrypt(priv_key, input):
 
@@ -27,3 +28,43 @@ sign(priv_key, pub_key, input_str):
 verify(pub_key, signed_input):
 
 - verifys the validity of the signed message
+
+Listed below you can see an example of codes using the functions of PyNTRU
+
+--Encryption--
+
+from PyNTRU.NTRU import *
+
+#message that will be encrypted
+msg = b'texttexttexttexttexttexttexttext'
+
+#generation of keys
+priv_key, pub_key = generate()
+
+#encryption
+enc_text = encrypt(pub_key, msg)
+
+#decryption
+plain_text = decrypt(priv_key, enc_text)
+
+if plain_text == msg:
+    print('success!')
+
+--Signature--
+
+from PyNTRU.NTRU import *
+
+#message that will be signed
+msg = b'Lorem ipsum odor amet, consectetuer adipiscing elit. Neque bibendum nulla lacinia pulvinar elementum non dui! Rhoncus justo nullam placerat eu duis ridiculus luctus. Ut egestas ante justo fermentum suspendisse consequat ligula. Curabitur blandit magnis dig'
+
+#generation of keys
+priv_key, pub_key = generate()
+
+#signing the message
+signed_msg = sign(priv_key, pub_key, msg)
+
+#signature verification
+if verify(pub_key, signed_msg):
+    print('Valid signature!')
+else:
+    print('Invalid signature.')

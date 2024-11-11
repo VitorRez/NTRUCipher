@@ -30,12 +30,16 @@ def generate(N=256, p=3, q=128, Dmin=55, Dmax=87):
 
 def encrypt(pub_key, input_str):
 
+    if isinstance(input_str, str):
+        input_str = input_str.encode('utf-8')
+
     input = np.unpackbits(np.frombuffer(input_str, dtype=np.uint8))
     pub_key = pickle.loads(pub_key)
     
     ntru = NTRUEncrypt(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']))
     ntru.h_poly = Poly(pub_key['h_c'].astype(int)[::-1], x).set_domain(ZZ)
 
+    print(len(input), ntru.N)
     if ntru.N < len(input):
         raise Exception("Input is too large for current N")
     
@@ -60,6 +64,9 @@ def decrypt(priv_key, input):
     return (np.packbits(np.array(decrypted).astype(int)).tobytes())
 
 def sign(priv_key, pub_key, input_str):
+
+    if isinstance(input_str, str):
+        input_str = input_str.encode('utf-8')
 
     pub_key = pickle.loads(pub_key)
     priv_key = pickle.loads(priv_key)

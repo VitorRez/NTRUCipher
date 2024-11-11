@@ -1,4 +1,4 @@
-from PyNTRU.ntru.mathutils import *
+from PyNTRU.mathutils import *
 from sympy.abc import x
 from sympy.polys.polyerrors import NotInvertible
 from sympy import ZZ, Poly

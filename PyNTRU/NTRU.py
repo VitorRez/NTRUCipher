@@ -1,6 +1,6 @@
-from PyNTRU.ntru.NTRUEncrypt import NTRUEncrypt
-from PyNTRU.ntru.NSS import NSS
-from PyNTRU.ntru.mathutils import random_poly
+from PyNTRU.NTRUEncrypt import NTRUEncrypt
+from PyNTRU.NSS import NSS
+from PyNTRU.mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
 import numpy as np
@@ -57,7 +57,7 @@ def decrypt(priv_key, input):
     
     decrypted = ntru.decrypt(Poly(input[::-1], x).set_domain(ZZ)).all_coeffs()[::-1]
 
-    return(np.packbits(np.array(decrypted).astype(int)).tobytes())
+    return (np.packbits(np.array(decrypted).astype(int)).tobytes())
 
 def sign(priv_key, pub_key, input_str):
 
@@ -75,14 +75,14 @@ def sign(priv_key, pub_key, input_str):
     m_poly, s = ntru.sign(input_str)
     return pickle.dumps(m_poly.all_coeffs()), pickle.dumps(s.all_coeffs())
 
-def verify(pub_key, m_poly, s):
+def verify(pub_key, signed_input):
 
-    m_poly = pickle.loads(m_poly)
-    s = pickle.loads(s)
+    m_poly = pickle.loads(signed_input[0])
+    signed_m = pickle.loads(signed_input[1])
     pub_key = pickle.loads(pub_key)
 
     ntru = NSS(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']), int(pub_key['Dmin']), int(pub_key['Dmax']))
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
     
-    return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(s, x).set_domain(ZZ))
+    return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(signed_m, x).set_domain(ZZ))
 

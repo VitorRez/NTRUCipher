@@ -26,7 +26,7 @@ def generate(N=256, p=3, q=128, Dmin=55, Dmax=87):
     priv_key = {'N': N, 'p': p, 'q': q, 'f_c': f_c, 'f_p_c': f_p_c, 'g_c': g_c, 'f_s': f_s, 'g_s': g_s, 'Dmin': Dmin, 'Dmax': Dmax}
     pub_key = {'N': N, 'p': p, 'q': q, 'h_c': h_c, 'h_s': h_s, 'Dmin': Dmin, 'Dmax': Dmax}
 
-    return pickle.dumps(priv_key), pickle.dumps(pub_key)
+    return {'private_key': pickle.dumps(priv_key), 'public_key': pickle.dumps(pub_key)}
 
 def encrypt(pub_key, input_str):
 
@@ -39,7 +39,6 @@ def encrypt(pub_key, input_str):
     ntru = NTRUEncrypt(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']))
     ntru.h_poly = Poly(pub_key['h_c'].astype(int)[::-1], x).set_domain(ZZ)
 
-    print(len(input), ntru.N)
     if ntru.N < len(input):
         raise Exception("Input is too large for current N")
     

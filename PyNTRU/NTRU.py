@@ -7,7 +7,7 @@ import numpy as np
 import math
 import pickle
 
-def generate(N, p, q, Dmin, Dmax):
+def generate(N=256, p=3, q=128, Dmin=55, Dmax=87):
     ntruc = NTRUEncrypt(N, p, q)
     ntruc.generate_random_keys()
     

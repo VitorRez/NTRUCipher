@@ -34,8 +34,10 @@ def invert_poly(f_poly, R_poly, p):
         raise Exception("Cannot invert polynomial in Z_{}".format(p))
     return inv_poly
 
+
 def string_to_int_array(input_str):
     return [ord(c) for c in input_str]
+
 
 def int_array_to_string(arr):
     arr = [(i % 256) for i in arr]

@@ -1,6 +1,6 @@
-from PyNTRU.NTRUEncrypt import NTRUEncrypt
-from PyNTRU.NSS import NSS
-from PyNTRU.mathutils import random_poly
+from .NTRUEncrypt import NTRUEncrypt
+from .NSS import NSS
+from .mathutils import random_poly
 from sympy.abc import x
 from sympy import ZZ, Poly
 import numpy as np

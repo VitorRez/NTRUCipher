@@ -67,7 +67,7 @@ keys = generate()
 signed_msg = sign(keys['private_key'], keys['public_key'], msg)
 
 #signature verification
-if verify(keys['public_key'], signed_msg):
+if verify(keys['public_key'], msg, signed_msg):
     print('Valid signature!')
 else:
     print('Invalid signature.')

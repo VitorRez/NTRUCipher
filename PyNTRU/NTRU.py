@@ -78,17 +78,19 @@ def sign(priv_key, pub_key, input_str):
     if ntru.N < len(input_str):
         raise Exception("Input is too large for current N")
     
-    m_poly, s = ntru.sign(input_str)
-    return pickle.dumps(m_poly.all_coeffs()), pickle.dumps(s.all_coeffs())
+    s = ntru.sign(input_str)
+    return pickle.dumps(s.all_coeffs())
 
-def verify(pub_key, signed_input):
+def verify(pub_key, input_str, signed_input):
 
-    m_poly = pickle.loads(signed_input[0])
-    signed_m = pickle.loads(signed_input[1])
+    if isinstance(input_str, str):
+        input_str = input_str.encode('utf-8')
+
+    signed_m = pickle.loads(signed_input)
     pub_key = pickle.loads(pub_key)
 
     ntru = NSS(int(pub_key['N']), int(pub_key['p']), int(pub_key['q']), int(pub_key['Dmin']), int(pub_key['Dmax']))
     ntru.h_poly = Poly(pub_key['h_s'].astype(int)[::-1], x).set_domain(ZZ)
     
-    return ntru.verify(Poly(m_poly, x).set_domain(ZZ), Poly(signed_m, x).set_domain(ZZ))
+    return ntru.verify(input_str, Poly(signed_m, x).set_domain(ZZ))
 

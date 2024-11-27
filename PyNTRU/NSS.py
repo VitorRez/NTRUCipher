@@ -154,16 +154,15 @@ class NSS:
 
         return m_poly + w1 + self.p * w2
     
-    def sign(self, msg_poly):
-        m_poly = self.hash_message(msg_poly)
-        tries = 100
+    def sign(self, msg):
+        m_poly = self.hash_message(msg)
         w = self.generate_w(m_poly)
         s = (self.f_poly * w % self.R_poly).trunc(self.q)
-        while not self.verify(m_poly, s):
+        while not self.verify(msg, s):
             w = self.generate_w(m_poly)
             s = (self.f_poly * w % self.R_poly).trunc(self.q)
 
-        return m_poly, s
+        return s
 
     def deviation(self, poly1, poly2):
 
@@ -180,9 +179,11 @@ class NSS:
 
         return sum(1 for a, b in zip(a_p, b_p) if a != b)
 
-    def verify(self, m_poly, s):
+    def verify(self, msg, s):
         if s == 0:
             return False
+        
+        m_poly = self.hash_message(msg)
         
         f0_m = (self.f0_poly * m_poly)
         dev_s_f0_m = self.deviation(s, f0_m)
